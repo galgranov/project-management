@@ -4,11 +4,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BoardsController } from './controllers/boards.controller';
 import { TasksController } from './controllers/tasks.controller';
+import { UsersController } from './controllers/users.controller';
 import { BoardsService } from './services/boards.service';
 import { TasksService } from './services/tasks.service';
+import { UsersService } from './services/users.service';
 import { Board, BoardSchema } from './schemas/board.schema';
 import { Column, ColumnSchema } from './schemas/column.schema';
 import { Task, TaskSchema } from './schemas/task.schema';
+import { User, UserSchema } from './schemas/user.schema';
 
 @Module({
   imports: [
@@ -19,9 +22,10 @@ import { Task, TaskSchema } from './schemas/task.schema';
       { name: Board.name, schema: BoardSchema },
       { name: Column.name, schema: ColumnSchema },
       { name: Task.name, schema: TaskSchema },
+      { name: User.name, schema: UserSchema },
     ]),
   ],
-  controllers: [AppController, BoardsController, TasksController],
-  providers: [AppService, BoardsService, TasksService],
+  controllers: [AppController, BoardsController, TasksController, UsersController],
+  providers: [AppService, BoardsService, TasksService, UsersService],
 })
 export class AppModule {}

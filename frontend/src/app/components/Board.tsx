@@ -29,11 +29,12 @@ interface Board {
 }
 
 interface User {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   role: string;
-  createdAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const API_URL = 'http://localhost:3000/api';
@@ -62,47 +63,58 @@ export function Board() {
 
   useEffect(() => {
     fetchBoards();
-    loadUsers();
+    fetchUsers();
   }, []);
 
-  const loadUsers = () => {
-    const savedUsers = localStorage.getItem('users');
-    if (savedUsers) {
-      setUsers(JSON.parse(savedUsers));
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${API_URL}/users`);
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
     }
   };
 
-  const saveUsers = (updatedUsers: User[]) => {
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    setUsers(updatedUsers);
-  };
-
-  const createUser = () => {
+  const createUser = async () => {
     if (!newUserName.trim() || !newUserEmail.trim()) {
       toast.error('Please enter name and email');
       return;
     }
 
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: newUserName,
-      email: newUserEmail,
-      role: newUserRole,
-      createdAt: new Date().toISOString(),
-    };
-
-    const updatedUsers = [...users, newUser];
-    saveUsers(updatedUsers);
-    setNewUserName('');
-    setNewUserEmail('');
-    setNewUserRole('member');
-    toast.success('User created successfully!');
+    try {
+      const response = await fetch(`${API_URL}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newUserName,
+          email: newUserEmail,
+          role: newUserRole,
+        }),
+      });
+      const newUser = await response.json();
+      setUsers([...users, newUser]);
+      setNewUserName('');
+      setNewUserEmail('');
+      setNewUserRole('member');
+      toast.success('User created successfully!');
+    } catch (error) {
+      console.error('Error creating user:', error);
+      toast.error('Failed to create user');
+    }
   };
 
-  const deleteUser = (userId: string) => {
-    const updatedUsers = users.filter(user => user.id !== userId);
-    saveUsers(updatedUsers);
-    toast.success('User deleted successfully!');
+  const deleteUser = async (userId: string) => {
+    try {
+      await fetch(`${API_URL}/users/${userId}`, {
+        method: 'DELETE',
+      });
+      setUsers(users.filter(user => user._id !== userId));
+      toast.success('User deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('Failed to delete user');
+    }
   };
 
   const filteredUsers = users.filter(user =>
@@ -399,7 +411,7 @@ export function Board() {
                   </thead>
                   <tbody>
                     {users.map((user) => (
-                      <tr key={user.id}>
+                      <tr key={user._id}>
                         <td>
                           <div className="user-info">
                             <span className="user-avatar">{user.name.charAt(0).toUpperCase()}</span>
@@ -412,11 +424,11 @@ export function Board() {
                             {user.role}
                           </span>
                         </td>
-                        <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                        <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}</td>
                         <td>
                           <button
                             className="btn-delete-user"
-                            onClick={() => deleteUser(user.id)}
+                            onClick={() => deleteUser(user._id)}
                           >
                             Delete
                           </button>
@@ -551,7 +563,7 @@ export function Board() {
                     <div className="autocomplete-dropdown">
                       {filteredUsers.map((user) => (
                         <div
-                          key={user.id}
+                          key={user._id}
                           className="autocomplete-item"
                           onClick={() => handleUserSelect(user.name)}
                         >
