@@ -28,10 +28,22 @@ interface Board {
   description?: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+}
+
 const API_URL = 'http://localhost:3000/api';
 
 export function Board() {
   const [boards, setBoards] = useState<Board[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserRole, setNewUserRole] = useState('member');
   const [selectedBoard, setSelectedBoard] = useState<Board | null>(null);
   const [columns, setColumns] = useState<Column[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -47,7 +59,48 @@ export function Board() {
 
   useEffect(() => {
     fetchBoards();
+    loadUsers();
   }, []);
+
+  const loadUsers = () => {
+    const savedUsers = localStorage.getItem('users');
+    if (savedUsers) {
+      setUsers(JSON.parse(savedUsers));
+    }
+  };
+
+  const saveUsers = (updatedUsers: User[]) => {
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    setUsers(updatedUsers);
+  };
+
+  const createUser = () => {
+    if (!newUserName.trim() || !newUserEmail.trim()) {
+      toast.error('Please enter name and email');
+      return;
+    }
+
+    const newUser: User = {
+      id: Date.now().toString(),
+      name: newUserName,
+      email: newUserEmail,
+      role: newUserRole,
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedUsers = [...users, newUser];
+    saveUsers(updatedUsers);
+    setNewUserName('');
+    setNewUserEmail('');
+    setNewUserRole('member');
+    toast.success('User created successfully!');
+  };
+
+  const deleteUser = (userId: string) => {
+    const updatedUsers = users.filter(user => user.id !== userId);
+    saveUsers(updatedUsers);
+    toast.success('User deleted successfully!');
+  };
 
   useEffect(() => {
     if (selectedBoard) {
@@ -269,10 +322,86 @@ export function Board() {
 
         {activeMenu === 'users' && (
           <div className="content-section">
-            <div className="empty-state">
-              <h2>👥 Users</h2>
-              <p>User management coming soon</p>
+            <div className="users-header">
+              <h2>Team Members</h2>
+              <p>Manage your team members and their roles</p>
             </div>
+
+            <div className="user-form-card">
+              <h3>Add New User</h3>
+              <div className="user-form">
+                <input
+                  type="text"
+                  value={newUserName}
+                  onChange={(e) => setNewUserName(e.target.value)}
+                  placeholder="Full name"
+                />
+                <input
+                  type="email"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  placeholder="Email address"
+                />
+                <select
+                  value={newUserRole}
+                  onChange={(e) => setNewUserRole(e.target.value)}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="member">Member</option>
+                  <option value="viewer">Viewer</option>
+                </select>
+                <button onClick={createUser} className="btn-add-user">
+                  Add User
+                </button>
+              </div>
+            </div>
+
+            {users.length > 0 ? (
+              <div className="users-table-container">
+                <table className="users-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => (
+                      <tr key={user.id}>
+                        <td>
+                          <div className="user-info">
+                            <span className="user-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                            <span className="user-name">{user.name}</span>
+                          </div>
+                        </td>
+                        <td>{user.email}</td>
+                        <td>
+                          <span className={`role-badge role-${user.role}`}>
+                            {user.role}
+                          </span>
+                        </td>
+                        <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <button
+                            className="btn-delete-user"
+                            onClick={() => deleteUser(user.id)}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-users">
+                <p>No users yet. Add your first team member above.</p>
+              </div>
+            )}
           </div>
         )}
 
