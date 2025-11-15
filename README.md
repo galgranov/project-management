@@ -1,77 +1,273 @@
-# ProjectManagement
+# Project Management Application 🚀
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A Monday.com-inspired project management application built with **Nx monorepo**, featuring a **React + Vite** frontend and **NestJS** backend.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+## 📋 Features
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+- **Board Management**: Create and manage multiple project boards
+- **Kanban Columns**: Default columns (To Do, In Progress, Done) created automatically
+- **Task Management**: Create, view, and delete tasks
+- **Task Organization**: Organize tasks across different columns
+- **Priority Levels**: Low, Medium, High, and Urgent priorities
+- **Real-time Updates**: Immediate UI updates after actions
+- **Beautiful UI**: Modern gradient design with smooth animations
 
-## Finish your CI setup
+## 🛠️ Tech Stack
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/toduoDRumT)
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for fast development and building
+- **CSS** for styling with modern animations
 
+### Backend
+- **NestJS** framework
+- **TypeScript**
+- **In-memory data storage** (easily replaceable with database)
+- **UUID** for unique identifiers
 
-## Run tasks
+### Monorepo
+- **Nx** for workspace management
+- **npm** for package management
 
-To run tasks with Nx use:
+## 🏗️ Project Structure
 
-```sh
-npx nx <target> <project-name>
+```
+project-management/
+├── frontend/                 # React + Vite frontend
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── components/
+│   │   │   │   ├── Board.tsx      # Main board component
+│   │   │   │   └── Board.css      # Component styles
+│   │   │   └── app.tsx            # App entry point
+│   │   └── main.tsx
+│   └── vite.config.ts
+│
+├── backend/                  # NestJS backend
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── models/
+│   │   │   │   ├── board.model.ts # Board & Column interfaces
+│   │   │   │   └── task.model.ts  # Task interface & enums
+│   │   │   ├── services/
+│   │   │   │   ├── boards.service.ts
+│   │   │   │   └── tasks.service.ts
+│   │   │   ├── controllers/
+│   │   │   │   ├── boards.controller.ts
+│   │   │   │   └── tasks.controller.ts
+│   │   │   └── app.module.ts
+│   │   └── main.ts
+│   └── webpack.config.js
+│
+├── nx.json
+├── package.json
+└── README.md
 ```
 
-For example:
+## 🚀 Getting Started
 
-```sh
-npx nx build myproject
+### Prerequisites
+
+- **Node.js** (v18 or higher recommended)
+- **npm** (v8 or higher)
+
+### Installation
+
+1. **Navigate to the project directory:**
+   ```bash
+   cd project-management
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+### Running the Application
+
+You need to run both the backend and frontend in separate terminals.
+
+#### Terminal 1 - Backend:
+```bash
+npx nx serve backend
+```
+The backend will start on `http://localhost:3000`
+
+#### Terminal 2 - Frontend:
+```bash
+npx nx serve frontend
+```
+The frontend will start on `http://localhost:4200`
+
+### Accessing the Application
+
+Open your browser and navigate to:
+```
+http://localhost:4200
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## 📖 API Endpoints
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Boards
 
-## Add new projects
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/boards` | Get all boards |
+| GET | `/api/boards/:id` | Get board by ID |
+| POST | `/api/boards` | Create a new board |
+| PUT | `/api/boards/:id` | Update a board |
+| DELETE | `/api/boards/:id` | Delete a board |
 
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
+### Columns
 
-To install a new plugin you can use the `nx add` command. Here's an example of adding the React plugin:
-```sh
-npx nx add @nx/react
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/boards/:boardId/columns` | Get columns for a board |
+| POST | `/api/boards/:boardId/columns` | Create a column |
+| PUT | `/api/boards/columns/:id` | Update a column |
+| DELETE | `/api/boards/columns/:id` | Delete a column |
+
+### Tasks
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/tasks` | Get all tasks |
+| GET | `/api/tasks/board/:boardId` | Get tasks by board |
+| GET | `/api/tasks/column/:columnId` | Get tasks by column |
+| GET | `/api/tasks/:id` | Get task by ID |
+| POST | `/api/tasks` | Create a new task |
+| PUT | `/api/tasks/:id` | Update a task |
+| PUT | `/api/tasks/:id/move` | Move task to different column |
+| DELETE | `/api/tasks/:id` | Delete a task |
+
+## 💡 Usage Guide
+
+### Creating a Board
+1. Enter a board name in the input field at the top
+2. Click "Create Board" or press Enter
+3. The board is automatically created with 3 default columns
+
+### Adding Tasks
+1. Select a board from the tabs
+2. Enter a task title
+3. Select a column from the dropdown
+4. Click "Add Task"
+
+### Managing Tasks
+- **View**: Tasks are displayed in their respective columns
+- **Delete**: Click the × button on any task card
+- **Priority**: Tasks show their priority level with color-coded badges
+
+## 🔧 Development Commands
+
+### Run Tests
+```bash
+# Frontend tests
+npx nx test frontend
+
+# Backend tests
+npx nx test backend
 ```
 
-Use the plugin's generator to create new projects. For example, to create a new React app or library:
+### Build for Production
+```bash
+# Build frontend
+npx nx build frontend
 
-```sh
-# Generate an app
-npx nx g @nx/react:app demo
-
-# Generate a library
-npx nx g @nx/react:lib some-lib
+# Build backend
+npx nx build backend
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
+### Lint Code
+```bash
+# Lint frontend
+npx nx lint frontend
 
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+# Lint backend
+npx nx lint backend
+```
 
+### Generate Components
+```bash
+# Generate a React component
+npx nx g @nx/react:component my-component --project=frontend
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+# Generate a NestJS service
+npx nx g @nx/nest:service my-service --project=backend
+```
 
-## Install Nx Console
+## 🎨 Customization
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+### Adding a Database
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+The application currently uses in-memory storage. To add a database:
 
-## Useful links
+1. Install database package (e.g., TypeORM with PostgreSQL):
+   ```bash
+   npm install @nestjs/typeorm typeorm pg
+   ```
 
-Learn more:
+2. Update the models to use TypeORM entities
+3. Add TypeORM configuration to `app.module.ts`
+4. Update services to use repositories
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/intro#learn-nx?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+### Adding Authentication
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+1. Install Passport and JWT:
+   ```bash
+   npm install @nestjs/passport @nestjs/jwt passport passport-jwt
+   ```
+
+2. Create auth module and guards
+3. Protect routes with guards
+4. Add user ownership to boards and tasks
+
+### Adding Drag & Drop
+
+1. Install a drag & drop library:
+   ```bash
+   npm install @dnd-kit/core @dnd-kit/sortable
+   ```
+
+2. Update the Board component to handle drag events
+3. Add move/reorder API endpoints
+
+## 🐛 Known Issues
+
+- **Node.js Version**: Some packages require Node.js v20+. The application works with v18 but you may see warnings.
+- **Vite Plugin**: Temporarily disabled in nx.json to avoid configuration issues during development.
+
+## 📝 Future Enhancements
+
+- [ ] Add database persistence
+- [ ] Implement user authentication
+- [ ] Add drag & drop for tasks
+- [ ] Add task assignment to users
+- [ ] Add due dates and reminders
+- [ ] Add task comments and attachments
+- [ ] Add board templates
+- [ ] Add real-time collaboration with WebSockets
+- [ ] Add task filtering and search
+- [ ] Add activity timeline
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgments
+
+- Inspired by [Monday.com](https://monday.com)
+- Built with [Nx](https://nx.dev)
+- Powered by [NestJS](https://nestjs.com) and [React](https://react.dev)
+
+---
+
+**Happy Project Managing! 🎉**
