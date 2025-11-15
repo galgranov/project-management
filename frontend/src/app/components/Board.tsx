@@ -60,6 +60,9 @@ export function Board() {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [isBoardListExpanded, setIsBoardListExpanded] = useState(true);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editTaskTitle, setEditTaskTitle] = useState('');
+  const [editTaskDescription, setEditTaskDescription] = useState('');
 
   useEffect(() => {
     fetchBoards();
@@ -242,9 +245,57 @@ export function Board() {
         method: 'DELETE',
       });
       setTasks(tasks.filter(task => task._id !== taskId));
+      toast.success('Task deleted successfully!');
     } catch (error) {
       console.error('Error deleting task:', error);
+      toast.error('Failed to delete task');
     }
+  };
+
+  const handleTaskClick = (task: Task) => {
+    setEditingTaskId(task._id);
+    setEditTaskTitle(task.title);
+    setEditTaskDescription(task.description || '');
+  };
+
+  const updateTask = async (taskId: string) => {
+    if (!editTaskTitle.trim()) {
+      toast.error('Task title cannot be empty');
+      return;
+    }
+
+    try {
+      const task = tasks.find(t => t._id === taskId);
+      if (!task) return;
+
+      const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...task,
+          title: editTaskTitle,
+          description: editTaskDescription.trim() || undefined,
+        }),
+      });
+
+      if (response.ok) {
+        const updatedTask = await response.json();
+        setTasks(tasks.map(t => t._id === updatedTask._id ? updatedTask : t));
+        setEditingTaskId(null);
+        setEditTaskTitle('');
+        setEditTaskDescription('');
+        toast.success('Task updated successfully!');
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+      toast.error('Failed to update task');
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingTaskId(null);
+    setEditTaskTitle('');
+    setEditTaskDescription('');
   };
 
   const handleDragStart = (task: Task) => {
@@ -484,28 +535,67 @@ export function Board() {
                     .map((task) => (
                       <div 
                         key={task._id} 
-                        className={`task-card ${draggedTask?._id === task._id ? 'dragging' : ''}`}
-                        draggable
+                        className={`task-card ${draggedTask?._id === task._id ? 'dragging' : ''} ${editingTaskId === task._id ? 'editing' : ''}`}
+                        draggable={editingTaskId !== task._id}
                         onDragStart={() => handleDragStart(task)}
                       >
-                        <h4>{task.title}</h4>
-                        {task.description && <p>{task.description}</p>}
-                        {task.owner && (
-                          <div className="task-owner">
-                            <span className="owner-badge">👤 {task.owner}</span>
+                        {editingTaskId === task._id ? (
+                          <div className="task-edit-mode">
+                            <input
+                              type="text"
+                              value={editTaskTitle}
+                              onChange={(e) => setEditTaskTitle(e.target.value)}
+                              className="edit-task-title"
+                              placeholder="Task title..."
+                              autoFocus
+                            />
+                            <textarea
+                              value={editTaskDescription}
+                              onChange={(e) => setEditTaskDescription(e.target.value)}
+                              className="edit-task-description"
+                              placeholder="Description..."
+                              rows={2}
+                            />
+                            <div className="edit-task-actions">
+                              <button 
+                                className="btn-save-task"
+                                onClick={() => updateTask(task._id)}
+                              >
+                                Save
+                              </button>
+                              <button 
+                                className="btn-cancel-task"
+                                onClick={cancelEdit}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div onClick={() => handleTaskClick(task)}>
+                            <h4>{task.title}</h4>
+                            {task.description && <p>{task.description}</p>}
+                            {task.owner && (
+                              <div className="task-owner">
+                                <span className="owner-badge">👤 {task.owner}</span>
+                              </div>
+                            )}
+                            <div className="task-meta">
+                              <span className={`priority priority-${task.priority}`}>
+                                {task.priority}
+                              </span>
+                              <button
+                                className="delete-btn"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteTask(task._id);
+                                }}
+                              >
+                                ×
+                              </button>
+                            </div>
                           </div>
                         )}
-                        <div className="task-meta">
-                          <span className={`priority priority-${task.priority}`}>
-                            {task.priority}
-                          </span>
-                          <button
-                            className="delete-btn"
-                            onClick={() => deleteTask(task._id)}
-                          >
-                            ×
-                          </button>
-                        </div>
                       </div>
                     ))}
                 </div>
