@@ -971,6 +971,37 @@
   margin: 0;
 }
 
+.edit-owner-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edit-owner-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5c6f68;
+}
+
+.edit-owner-input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #d0d5dd;
+  border-radius: 4px;
+  font-size: 13px;
+  background: #ffffff;
+  color: #001e2b;
+  transition: all 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.edit-owner-input:focus {
+  outline: none;
+  border-color: #00ed64;
+  box-shadow: 0 0 0 2px rgba(0, 237, 100, 0.15);
+}
+
 .edit-task-actions {
   display: flex;
   gap: 8px;

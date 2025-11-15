@@ -63,6 +63,9 @@ export function Board() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editTaskTitle, setEditTaskTitle] = useState('');
   const [editTaskDescription, setEditTaskDescription] = useState('');
+  const [editTaskOwner, setEditTaskOwner] = useState('');
+  const [editOwnerSearchQuery, setEditOwnerSearchQuery] = useState('');
+  const [showEditOwnerDropdown, setShowEditOwnerDropdown] = useState(false);
 
   useEffect(() => {
     fetchBoards();
@@ -256,6 +259,24 @@ export function Board() {
     setEditingTaskId(task._id);
     setEditTaskTitle(task.title);
     setEditTaskDescription(task.description || '');
+    setEditTaskOwner(task.owner || '');
+    setEditOwnerSearchQuery(task.owner || '');
+  };
+
+  const filteredEditUsers = users.filter(user =>
+    user.name.toLowerCase().includes(editOwnerSearchQuery.toLowerCase())
+  );
+
+  const handleEditOwnerSelect = (userName: string) => {
+    setEditTaskOwner(userName);
+    setEditOwnerSearchQuery(userName);
+    setShowEditOwnerDropdown(false);
+  };
+
+  const handleEditOwnerSearchChange = (value: string) => {
+    setEditOwnerSearchQuery(value);
+    setEditTaskOwner(value);
+    setShowEditOwnerDropdown(value.length > 0);
   };
 
   const updateTask = async (taskId: string) => {
@@ -275,6 +296,7 @@ export function Board() {
           ...task,
           title: editTaskTitle,
           description: editTaskDescription.trim() || undefined,
+          owner: editTaskOwner.trim() || undefined,
         }),
       });
 
@@ -284,6 +306,8 @@ export function Board() {
         setEditingTaskId(null);
         setEditTaskTitle('');
         setEditTaskDescription('');
+        setEditTaskOwner('');
+        setEditOwnerSearchQuery('');
         toast.success('Task updated successfully!');
       }
     } catch (error) {
@@ -296,6 +320,9 @@ export function Board() {
     setEditingTaskId(null);
     setEditTaskTitle('');
     setEditTaskDescription('');
+    setEditTaskOwner('');
+    setEditOwnerSearchQuery('');
+    setShowEditOwnerDropdown(false);
   };
 
   const handleDragStart = (task: Task) => {
@@ -556,11 +583,37 @@ export function Board() {
                               placeholder="Description..."
                               rows={2}
                             />
-                            {task.owner && (
-                              <div className="task-owner">
-                                <span className="owner-badge">👤 {task.owner}</span>
+                            <div className="edit-owner-wrapper">
+                              <label className="edit-owner-label">Assign To</label>
+                              <div className="autocomplete-wrapper">
+                                <input
+                                  type="text"
+                                  value={editOwnerSearchQuery}
+                                  onChange={(e) => handleEditOwnerSearchChange(e.target.value)}
+                                  onFocus={() => setShowEditOwnerDropdown(true)}
+                                  onBlur={() => setTimeout(() => setShowEditOwnerDropdown(false), 200)}
+                                  placeholder="Search user..."
+                                  className="edit-owner-input"
+                                />
+                                {showEditOwnerDropdown && filteredEditUsers.length > 0 && (
+                                  <div className="autocomplete-dropdown">
+                                    {filteredEditUsers.map((user) => (
+                                      <div
+                                        key={user._id}
+                                        className="autocomplete-item"
+                                        onClick={() => handleEditOwnerSelect(user.name)}
+                                      >
+                                        <span className="autocomplete-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                                        <div className="autocomplete-info">
+                                          <span className="autocomplete-name">{user.name}</span>
+                                          <span className="autocomplete-role">{user.role}</span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
-                            )}
+                            </div>
                             <div className="edit-task-actions">
                               <button 
                                 className="btn-save-task"
