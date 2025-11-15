@@ -510,12 +510,17 @@ export function Board() {
               <div className="form-row">
                 <div className="form-group">
                   <label>Assign To</label>
-                  <input
-                    type="text"
+                  <select
                     value={newTaskOwner}
                     onChange={(e) => setNewTaskOwner(e.target.value)}
-                    placeholder="Owner name..."
-                  />
+                  >
+                    <option value="">Unassigned</option>
+                    {users.map((user) => (
+                      <option key={user.id} value={user.name}>
+                        {user.name} ({user.role})
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Priority *</label>
