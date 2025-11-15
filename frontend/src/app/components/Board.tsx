@@ -58,6 +58,7 @@ export function Board() {
   const [activeMenu, setActiveMenu] = useState('boards');
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [isBoardListExpanded, setIsBoardListExpanded] = useState(true);
 
   useEffect(() => {
     fetchBoards();
@@ -302,31 +303,41 @@ export function Board() {
         {activeMenu === 'boards' && (
           <div className="sidebar-content">
             <div className="sidebar-section">
-              <div className="section-header">
+              <button 
+                className="section-header-toggle"
+                onClick={() => setIsBoardListExpanded(!isBoardListExpanded)}
+              >
+                <span className="toggle-icon">{isBoardListExpanded ? '▼' : '▶'}</span>
                 <h3>Your Boards</h3>
-              </div>
-              <div className="board-list">
-                {boards.map((board) => (
-                  <button
-                    key={board._id}
-                    className={`board-item ${selectedBoard?._id === board._id ? 'active' : ''}`}
-                    onClick={() => setSelectedBoard(board)}
-                  >
-                    <span className="board-icon">📊</span>
-                    <span className="board-name">{board.title}</span>
-                  </button>
-                ))}
-              </div>
-              <div className="board-creator-sidebar">
-                <input
-                  type="text"
-                  value={newBoardTitle}
-                  onChange={(e) => setNewBoardTitle(e.target.value)}
-                  placeholder="New board name..."
-                  onKeyPress={(e) => e.key === 'Enter' && createBoard()}
-                />
-                <button onClick={createBoard} className="btn-add-board">+</button>
-              </div>
+                <span className="board-count">{boards.length}</span>
+              </button>
+              
+              {isBoardListExpanded && (
+                <>
+                  <div className="board-list">
+                    {boards.map((board) => (
+                      <button
+                        key={board._id}
+                        className={`board-item ${selectedBoard?._id === board._id ? 'active' : ''}`}
+                        onClick={() => setSelectedBoard(board)}
+                      >
+                        <span className="board-icon">📊</span>
+                        <span className="board-name">{board.title}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="board-creator-sidebar">
+                    <input
+                      type="text"
+                      value={newBoardTitle}
+                      onChange={(e) => setNewBoardTitle(e.target.value)}
+                      placeholder="New board name..."
+                      onKeyPress={(e) => e.key === 'Enter' && createBoard()}
+                    />
+                    <button onClick={createBoard} className="btn-add-board">+</button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
