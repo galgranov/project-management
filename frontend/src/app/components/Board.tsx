@@ -556,6 +556,11 @@ export function Board() {
                               placeholder="Description..."
                               rows={2}
                             />
+                            {task.owner && (
+                              <div className="task-owner">
+                                <span className="owner-badge">👤 {task.owner}</span>
+                              </div>
+                            )}
                             <div className="edit-task-actions">
                               <button 
                                 className="btn-save-task"
