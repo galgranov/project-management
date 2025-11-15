@@ -326,7 +326,9 @@
 }
 
 .column {
-  min-width: 340px;
+  min-width: 300px;
+  max-width: 350px;
+  flex: 1;
   background: #ffffff;
   border: 1px solid #e7eae8;
   border-radius: 8px;
