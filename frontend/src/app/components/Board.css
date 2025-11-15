@@ -927,15 +927,16 @@
 
 .edit-task-title {
   width: 100%;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border: 1px solid #d0d5dd;
   border-radius: 4px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   background: #ffffff;
   color: #001e2b;
   transition: all 0.2s;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .edit-task-title:focus {
@@ -946,7 +947,7 @@
 
 .edit-task-description {
   width: 100%;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border: 1px solid #d0d5dd;
   border-radius: 4px;
   font-size: 13px;
@@ -955,14 +956,19 @@
   transition: all 0.2s;
   font-family: inherit;
   resize: vertical;
-  min-height: 50px;
-  line-height: 1.5;
+  min-height: 40px;
+  line-height: 1.4;
+  box-sizing: border-box;
 }
 
 .edit-task-description:focus {
   outline: none;
   border-color: #00ed64;
   box-shadow: 0 0 0 2px rgba(0, 237, 100, 0.15);
+}
+
+.task-edit-mode .task-owner {
+  margin: 0;
 }
 
 .edit-task-actions {
