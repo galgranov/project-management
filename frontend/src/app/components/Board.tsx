@@ -56,6 +56,8 @@ export function Board() {
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showTaskDialog, setShowTaskDialog] = useState(false);
   const [activeMenu, setActiveMenu] = useState('boards');
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
 
   useEffect(() => {
     fetchBoards();
@@ -100,6 +102,22 @@ export function Board() {
     const updatedUsers = users.filter(user => user.id !== userId);
     saveUsers(updatedUsers);
     toast.success('User deleted successfully!');
+  };
+
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
+  );
+
+  const handleUserSelect = (userName: string) => {
+    setNewTaskOwner(userName);
+    setUserSearchQuery(userName);
+    setShowUserDropdown(false);
+  };
+
+  const handleUserSearchChange = (value: string) => {
+    setUserSearchQuery(value);
+    setNewTaskOwner(value);
+    setShowUserDropdown(value.length > 0);
   };
 
   useEffect(() => {
@@ -508,19 +526,33 @@ export function Board() {
                 />
               </div>
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group autocomplete-wrapper">
                   <label>Assign To</label>
-                  <select
-                    value={newTaskOwner}
-                    onChange={(e) => setNewTaskOwner(e.target.value)}
-                  >
-                    <option value="">Unassigned</option>
-                    {users.map((user) => (
-                      <option key={user.id} value={user.name}>
-                        {user.name} ({user.role})
-                      </option>
-                    ))}
-                  </select>
+                  <input
+                    type="text"
+                    value={userSearchQuery}
+                    onChange={(e) => handleUserSearchChange(e.target.value)}
+                    onFocus={() => setShowUserDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowUserDropdown(false), 200)}
+                    placeholder="Search user..."
+                  />
+                  {showUserDropdown && filteredUsers.length > 0 && (
+                    <div className="autocomplete-dropdown">
+                      {filteredUsers.map((user) => (
+                        <div
+                          key={user.id}
+                          className="autocomplete-item"
+                          onClick={() => handleUserSelect(user.name)}
+                        >
+                          <span className="autocomplete-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                          <div className="autocomplete-info">
+                            <span className="autocomplete-name">{user.name}</span>
+                            <span className="autocomplete-role">{user.role}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="form-group">
                   <label>Priority *</label>

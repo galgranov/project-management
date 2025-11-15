@@ -792,3 +792,69 @@
   margin: 0;
   font-size: 15px;
 }
+
+/* Autocomplete Styles */
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e7eae8;
+  border-radius: 6px;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(0, 30, 43, 0.15);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.autocomplete-item:hover {
+  background: #f9fbfa;
+}
+
+.autocomplete-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #00ed64;
+  color: #001e2b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.autocomplete-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.autocomplete-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #001e2b;
+}
+
+.autocomplete-role {
+  font-size: 12px;
+  color: #5c6f68;
+  text-transform: capitalize;
+}
