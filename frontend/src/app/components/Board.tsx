@@ -38,8 +38,11 @@ export function Board() {
   const [newBoardTitle, setNewBoardTitle] = useState('');
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskOwner, setNewTaskOwner] = useState('');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
+  const [newTaskPriority, setNewTaskPriority] = useState('medium');
   const [selectedColumn, setSelectedColumn] = useState('');
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [showTaskDialog, setShowTaskDialog] = useState(false);
 
   useEffect(() => {
     fetchBoards();
@@ -122,16 +125,21 @@ export function Board() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: newTaskTitle,
+          description: newTaskDescription.trim() || undefined,
           columnId: selectedColumn,
           boardId: selectedBoard._id,
           owner: newTaskOwner.trim() || undefined,
+          priority: newTaskPriority,
         }),
       });
       const newTask = await response.json();
       setTasks([...tasks, newTask]);
       setNewTaskTitle('');
+      setNewTaskDescription('');
       setNewTaskOwner('');
+      setNewTaskPriority('medium');
       setSelectedColumn('');
+      setShowTaskDialog(false);
       toast.success('Task created successfully!');
     } catch (error) {
       console.error('Error creating task:', error);
@@ -215,31 +223,9 @@ export function Board() {
       {selectedBoard && (
         <>
           <div className="task-creator">
-            <input
-              type="text"
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="New task title..."
-            />
-            <input
-              type="text"
-              value={newTaskOwner}
-              onChange={(e) => setNewTaskOwner(e.target.value)}
-              placeholder="Assign to..."
-              style={{ minWidth: '150px' }}
-            />
-            <select
-              value={selectedColumn}
-              onChange={(e) => setSelectedColumn(e.target.value)}
-            >
-              <option value="">Select column...</option>
-              {columns.map((column) => (
-                <option key={column._id} value={column._id}>
-                  {column.title}
-                </option>
-              ))}
-            </select>
-            <button onClick={createTask}>Add Task</button>
+            <button onClick={() => setShowTaskDialog(true)} className="create-task-btn">
+              + Create New Task
+            </button>
           </div>
 
           <div className="columns-container">
@@ -294,6 +280,83 @@ export function Board() {
         <div className="empty-state">
           <h2>Welcome to Project Management!</h2>
           <p>Create your first board to get started</p>
+        </div>
+      )}
+
+      {showTaskDialog && (
+        <div className="modal-overlay" onClick={() => setShowTaskDialog(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Create New Task</h2>
+              <button className="modal-close" onClick={() => setShowTaskDialog(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label>Task Title *</label>
+                <input
+                  type="text"
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  placeholder="Enter task title..."
+                  autoFocus
+                />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  value={newTaskDescription}
+                  onChange={(e) => setNewTaskDescription(e.target.value)}
+                  placeholder="Enter task description..."
+                  rows={3}
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Assign To</label>
+                  <input
+                    type="text"
+                    value={newTaskOwner}
+                    onChange={(e) => setNewTaskOwner(e.target.value)}
+                    placeholder="Owner name..."
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Priority *</label>
+                  <select
+                    value={newTaskPriority}
+                    onChange={(e) => setNewTaskPriority(e.target.value)}
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Column *</label>
+                <select
+                  value={selectedColumn}
+                  onChange={(e) => setSelectedColumn(e.target.value)}
+                >
+                  <option value="">Select a column...</option>
+                  {columns.map((column) => (
+                    <option key={column._id} value={column._id}>
+                      {column.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-cancel" onClick={() => setShowTaskDialog(false)}>
+                Cancel
+              </button>
+              <button className="btn-create" onClick={createTask}>
+                Create Task
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
