@@ -43,6 +43,7 @@ export function Board() {
   const [selectedColumn, setSelectedColumn] = useState('');
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showTaskDialog, setShowTaskDialog] = useState(false);
+  const [activeMenu, setActiveMenu] = useState('boards');
 
   useEffect(() => {
     fetchBoards();
@@ -193,34 +194,98 @@ export function Board() {
   };
 
   return (
-    <div className="board-container">
-      <header className="header">
-        <h1>Project Management Board</h1>
-        <div className="board-creator">
-          <input
-            type="text"
-            value={newBoardTitle}
-            onChange={(e) => setNewBoardTitle(e.target.value)}
-            placeholder="New board name..."
-            onKeyPress={(e) => e.key === 'Enter' && createBoard()}
-          />
-          <button onClick={createBoard}>Create Board</button>
+    <div className="app-layout">
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <h2>🍃 Atlas PM</h2>
         </div>
-      </header>
-
-      <div className="board-selector">
-        {boards.map((board) => (
-          <button
-            key={board._id}
-            className={`board-tab ${selectedBoard?._id === board._id ? 'active' : ''}`}
-            onClick={() => setSelectedBoard(board)}
+        
+        <nav className="sidebar-nav">
+          <button 
+            className={`nav-item ${activeMenu === 'users' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('users')}
           >
-            {board.title}
+            <span className="nav-icon">👥</span>
+            <span className="nav-label">Users</span>
           </button>
-        ))}
-      </div>
+          
+          <button 
+            className={`nav-item ${activeMenu === 'boards' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('boards')}
+          >
+            <span className="nav-icon">📋</span>
+            <span className="nav-label">Boards</span>
+          </button>
+          
+          <button 
+            className={`nav-item ${activeMenu === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('settings')}
+          >
+            <span className="nav-icon">⚙️</span>
+            <span className="nav-label">Settings</span>
+          </button>
+        </nav>
 
-      {selectedBoard && (
+        {/* Boards List in Sidebar */}
+        {activeMenu === 'boards' && (
+          <div className="sidebar-content">
+            <div className="sidebar-section">
+              <div className="section-header">
+                <h3>Your Boards</h3>
+              </div>
+              <div className="board-list">
+                {boards.map((board) => (
+                  <button
+                    key={board._id}
+                    className={`board-item ${selectedBoard?._id === board._id ? 'active' : ''}`}
+                    onClick={() => setSelectedBoard(board)}
+                  >
+                    <span className="board-icon">📊</span>
+                    <span className="board-name">{board.title}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="board-creator-sidebar">
+                <input
+                  type="text"
+                  value={newBoardTitle}
+                  onChange={(e) => setNewBoardTitle(e.target.value)}
+                  placeholder="New board name..."
+                  onKeyPress={(e) => e.key === 'Enter' && createBoard()}
+                />
+                <button onClick={createBoard} className="btn-add-board">+</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </aside>
+
+      {/* Main Content */}
+      <main className="main-content">
+        <header className="top-header">
+          <h1>{selectedBoard ? selectedBoard.title : 'Project Management'}</h1>
+        </header>
+
+        {activeMenu === 'users' && (
+          <div className="content-section">
+            <div className="empty-state">
+              <h2>👥 Users</h2>
+              <p>User management coming soon</p>
+            </div>
+          </div>
+        )}
+
+        {activeMenu === 'settings' && (
+          <div className="content-section">
+            <div className="empty-state">
+              <h2>⚙️ Settings</h2>
+              <p>Settings page coming soon</p>
+            </div>
+          </div>
+        )}
+
+        {activeMenu === 'boards' && selectedBoard && (
         <>
           <div className="task-creator">
             <button onClick={() => setShowTaskDialog(true)} className="create-task-btn">
@@ -274,14 +339,17 @@ export function Board() {
             ))}
           </div>
         </>
-      )}
+        )}
 
-      {!selectedBoard && boards.length === 0 && (
-        <div className="empty-state">
-          <h2>Welcome to Project Management!</h2>
-          <p>Create your first board to get started</p>
-        </div>
-      )}
+        {activeMenu === 'boards' && !selectedBoard && boards.length === 0 && (
+          <div className="content-section">
+            <div className="empty-state">
+              <h2>Welcome to Project Management!</h2>
+              <p>Create your first board to get started</p>
+            </div>
+          </div>
+        )}
+      </main>
 
       {showTaskDialog && (
         <div className="modal-overlay" onClick={() => setShowTaskDialog(false)}>
